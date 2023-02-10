@@ -1,17 +1,20 @@
 let total = 0;
-let scale;
 
-if (document.monetization) {
-  document.monetization.addEventListener("monetizationprogress", ev => {
-    // initialize currency and scale on first progress event
+if (window.MonetizationEvent) {
+  const link = document.querySelector('link[rel="monetization"]');
+
+  link.addEventListener("monetization", (event) => {
+    const {
+      amountSent: { value, currency },
+    } = event;
+    console.log(`Browser sent ${currency} ${value}.`);
+
     if (total === 0) {
-      scale = ev.detail.assetScale;
-      document.getElementById("currency").innerText = ev.detail.assetCode;
+      document.getElementById("currency").innerText = currency;
     }
 
-    total += Number(ev.detail.amount);
+    total += Number(value);
 
-    const formatted = (total * Math.pow(10, -scale)).toFixed(scale);
-    document.getElementById("total").innerText = formatted;
+    document.getElementById("total").innerText = total.toFixed(9);
   });
 }
